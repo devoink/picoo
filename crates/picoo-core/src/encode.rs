@@ -18,16 +18,18 @@ pub struct EncodeResult {
     pub quality: Option<u8>,
 }
 
-pub fn encode(mut img: DynamicImage, input: &[u8], opts: &ProcessOptions) -> Result<EncodeResult, PicooError> {
+pub fn encode(
+    mut img: DynamicImage,
+    input: &[u8],
+    opts: &ProcessOptions,
+) -> Result<EncodeResult, PicooError> {
     let format = resolve_output_format(input, opts);
     let (data, quality) = if opts.max_size_kb.is_some() {
         encode_with_target_size(&mut img, format, opts)?
     } else {
         let q = opts.format_quality(format);
         match format {
-            OutputFormat::Png if q >= 100 => {
-                (encode_png_lossless(&img, opts.dpi)?, Some(q))
-            }
+            OutputFormat::Png if q >= 100 => (encode_png_lossless(&img, opts.dpi)?, Some(q)),
             OutputFormat::Webp if opts.webp_lossless() => {
                 (encode_webp_lossless(&img, opts.dpi)?, None)
             }
@@ -132,8 +134,12 @@ fn shrink_image(img: &mut DynamicImage, opts: &ProcessOptions) -> Result<bool, P
     if w <= opts.min_width() && h <= opts.min_height() {
         return Ok(false);
     }
-    let nw = ((w as f64 * 0.9).round() as u32).max(opts.min_width()).min(w);
-    let nh = ((h as f64 * 0.9).round() as u32).max(opts.min_height()).min(h);
+    let nw = ((w as f64 * 0.9).round() as u32)
+        .max(opts.min_width())
+        .min(w);
+    let nh = ((h as f64 * 0.9).round() as u32)
+        .max(opts.min_height())
+        .min(h);
     if nw == w && nh == h {
         return Ok(false);
     }
@@ -141,7 +147,12 @@ fn shrink_image(img: &mut DynamicImage, opts: &ProcessOptions) -> Result<bool, P
     Ok(true)
 }
 
-fn encode_once(img: &DynamicImage, format: OutputFormat, quality: u8, opts: &ProcessOptions) -> Result<Vec<u8>, PicooError> {
+fn encode_once(
+    img: &DynamicImage,
+    format: OutputFormat,
+    quality: u8,
+    opts: &ProcessOptions,
+) -> Result<Vec<u8>, PicooError> {
     match format {
         OutputFormat::Jpeg => encode_jpeg(img, quality, opts.dpi),
         OutputFormat::Png => {
@@ -168,8 +179,13 @@ fn encode_jpeg(img: &DynamicImage, quality: u8, dpi: Option<u32>) -> Result<Vec<
     if let Some(d) = dpi {
         enc.set_pixel_density(PixelDensity::dpi(d as u16));
     }
-    enc.write_image(rgb.as_raw(), rgb.width(), rgb.height(), ExtendedColorType::Rgb8)
-        .map_err(|e| PicooError::ProcessFailed(e.to_string()))?;
+    enc.write_image(
+        rgb.as_raw(),
+        rgb.width(),
+        rgb.height(),
+        ExtendedColorType::Rgb8,
+    )
+    .map_err(|e| PicooError::ProcessFailed(e.to_string()))?;
     Ok(buf)
 }
 
@@ -177,26 +193,47 @@ fn encode_png_lossless(img: &DynamicImage, dpi: Option<u32>) -> Result<Vec<u8>, 
     let mut buf = Vec::new();
     let rgba = img.to_rgba8();
     let enc = PngEncoder::new_with_quality(&mut buf, CompressionType::Best, FilterType::Adaptive);
-    enc.write_image(rgba.as_raw(), rgba.width(), rgba.height(), ExtendedColorType::Rgba8)
-        .map_err(|e| PicooError::ProcessFailed(e.to_string()))?;
+    enc.write_image(
+        rgba.as_raw(),
+        rgba.width(),
+        rgba.height(),
+        ExtendedColorType::Rgba8,
+    )
+    .map_err(|e| PicooError::ProcessFailed(e.to_string()))?;
     if let Some(d) = dpi {
         buf = dpi::set_png_dpi(&buf, d)?;
     }
     Ok(buf)
 }
 
-fn encode_webp_lossy(img: &DynamicImage, quality: u8, dpi: Option<u32>) -> Result<Vec<u8>, PicooError> {
+fn encode_webp_lossy(
+    img: &DynamicImage,
+    quality: u8,
+    dpi: Option<u32>,
+) -> Result<Vec<u8>, PicooError> {
     let config = LossyConfig::new().with_quality(f32::from(quality));
     let mut buf = if img.color().has_alpha() {
         let rgba = img.to_rgba8();
-        EncodeRequest::lossy(&config, rgba.as_raw(), PixelLayout::Rgba8, rgba.width(), rgba.height())
-            .encode()
-            .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
+        EncodeRequest::lossy(
+            &config,
+            rgba.as_raw(),
+            PixelLayout::Rgba8,
+            rgba.width(),
+            rgba.height(),
+        )
+        .encode()
+        .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
     } else {
         let rgb = img.to_rgb8();
-        EncodeRequest::lossy(&config, rgb.as_raw(), PixelLayout::Rgb8, rgb.width(), rgb.height())
-            .encode()
-            .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
+        EncodeRequest::lossy(
+            &config,
+            rgb.as_raw(),
+            PixelLayout::Rgb8,
+            rgb.width(),
+            rgb.height(),
+        )
+        .encode()
+        .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
     };
     if let Some(d) = dpi {
         buf = dpi::set_webp_dpi_placeholder(buf, d);
@@ -208,14 +245,26 @@ fn encode_webp_lossless(img: &DynamicImage, dpi: Option<u32>) -> Result<Vec<u8>,
     let config = LosslessConfig::new();
     let mut buf = if img.color().has_alpha() {
         let rgba = img.to_rgba8();
-        EncodeRequest::lossless(&config, rgba.as_raw(), PixelLayout::Rgba8, rgba.width(), rgba.height())
-            .encode()
-            .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
+        EncodeRequest::lossless(
+            &config,
+            rgba.as_raw(),
+            PixelLayout::Rgba8,
+            rgba.width(),
+            rgba.height(),
+        )
+        .encode()
+        .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
     } else {
         let rgb = img.to_rgb8();
-        EncodeRequest::lossless(&config, rgb.as_raw(), PixelLayout::Rgb8, rgb.width(), rgb.height())
-            .encode()
-            .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
+        EncodeRequest::lossless(
+            &config,
+            rgb.as_raw(),
+            PixelLayout::Rgb8,
+            rgb.width(),
+            rgb.height(),
+        )
+        .encode()
+        .map_err(|e| PicooError::ProcessFailed(e.to_string()))?
     };
     if let Some(d) = dpi {
         buf = dpi::set_webp_dpi_placeholder(buf, d);

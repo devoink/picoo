@@ -59,7 +59,10 @@ fn to_js_error(err: PicooError) -> JsValue {
     JsValue::from(obj)
 }
 
-pub fn run_pipeline(input: &[u8], opts: &ProcessOptions) -> Result<encode::EncodeResult, PicooError> {
+pub fn run_pipeline(
+    input: &[u8],
+    opts: &ProcessOptions,
+) -> Result<encode::EncodeResult, PicooError> {
     let img = decode::decode(input)?;
     let img = crop::apply(img, &opts.crop)?;
     let img = resize::apply(img, opts)?;
@@ -75,8 +78,8 @@ pub fn get_image_info(input: &[u8]) -> Result<String, JsValue> {
 
 #[wasm_bindgen]
 pub fn process_image(input: &[u8], opts_json: &str) -> Result<ProcessOutput, JsValue> {
-    let opts: ProcessOptions =
-        serde_json::from_str(opts_json).map_err(|e| to_js_error(PicooError::InvalidInput(e.to_string())))?;
+    let opts: ProcessOptions = serde_json::from_str(opts_json)
+        .map_err(|e| to_js_error(PicooError::InvalidInput(e.to_string())))?;
 
     let result = run_pipeline(input, &opts).map_err(to_js_error)?;
     let (format, mime_type) = encode::encode_result_meta(&result);
@@ -139,7 +142,8 @@ mod tests {
     #[test]
     fn deserializes_max_size_kb_alias() {
         let opts: ProcessOptions =
-            serde_json::from_str(r#"{"maxSizeKB":20,"width":500,"format":"jpeg","quality":80}"#).unwrap();
+            serde_json::from_str(r#"{"maxSizeKB":20,"width":500,"format":"jpeg","quality":80}"#)
+                .unwrap();
         assert_eq!(opts.max_size_kb, Some(20.0));
     }
 

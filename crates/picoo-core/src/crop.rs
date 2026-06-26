@@ -13,7 +13,9 @@ pub fn apply(img: DynamicImage, crop: &Option<CropOptions>) -> Result<DynamicIma
         return Err(PicooError::CropOutOfBounds);
     }
     if crop.width == 0 || crop.height == 0 {
-        return Err(PicooError::InvalidInput("crop dimensions must be > 0".into()));
+        return Err(PicooError::InvalidInput(
+            "crop dimensions must be > 0".into(),
+        ));
     }
 
     Ok(img.crop_imm(crop.x, crop.y, crop.width, crop.height))

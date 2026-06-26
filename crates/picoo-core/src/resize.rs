@@ -60,7 +60,11 @@ fn compute_fit_size(
     )
 }
 
-fn apply_cover(img: DynamicImage, target_w: u32, target_h: u32) -> Result<DynamicImage, PicooError> {
+fn apply_cover(
+    img: DynamicImage,
+    target_w: u32,
+    target_h: u32,
+) -> Result<DynamicImage, PicooError> {
     let tw = if target_w > 0 { target_w } else { img.width() };
     let th = if target_h > 0 { target_h } else { img.height() };
     let src_w = img.width();
@@ -73,8 +77,14 @@ fn apply_cover(img: DynamicImage, target_w: u32, target_h: u32) -> Result<Dynami
     let y = (src_h.saturating_sub(crop_h)) / 2;
 
     let cropped = img.crop_imm(x, y, crop_w.min(src_w - x), crop_h.min(src_h - y));
-    resize_rgba(&cropped.to_rgba8(), cropped.width(), cropped.height(), tw, th)
-        .map(DynamicImage::ImageRgba8)
+    resize_rgba(
+        &cropped.to_rgba8(),
+        cropped.width(),
+        cropped.height(),
+        tw,
+        th,
+    )
+    .map(DynamicImage::ImageRgba8)
 }
 
 fn apply_contain(
@@ -83,7 +93,13 @@ fn apply_contain(
     target_h: u32,
     opts: &ProcessOptions,
 ) -> Result<DynamicImage, PicooError> {
-    let (tw, th) = compute_fit_size(img.width(), img.height(), target_w, target_h, ResizeMode::Inside);
+    let (tw, th) = compute_fit_size(
+        img.width(),
+        img.height(),
+        target_w,
+        target_h,
+        ResizeMode::Inside,
+    );
     let resized = resize_rgba(&img.to_rgba8(), img.width(), img.height(), tw, th)?;
 
     let canvas_w = if target_w > 0 { target_w } else { tw };
@@ -117,9 +133,17 @@ fn parse_background(s: Option<&str>) -> Rgba<u8> {
     Rgba([255, 255, 255, 255])
 }
 
-fn resize_rgba(src: &RgbaImage, src_w: u32, src_h: u32, dst_w: u32, dst_h: u32) -> Result<RgbaImage, PicooError> {
+fn resize_rgba(
+    src: &RgbaImage,
+    src_w: u32,
+    src_h: u32,
+    dst_w: u32,
+    dst_h: u32,
+) -> Result<RgbaImage, PicooError> {
     if dst_w == 0 || dst_h == 0 {
-        return Err(PicooError::InvalidInput("target dimensions must be > 0".into()));
+        return Err(PicooError::InvalidInput(
+            "target dimensions must be > 0".into(),
+        ));
     }
 
     let src_image = Image::from_vec_u8(src_w, src_h, src.as_raw().clone(), PixelType::U8x4)

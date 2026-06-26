@@ -5,7 +5,11 @@ use crate::dpi;
 use crate::error::PicooError;
 
 /// Encode PNG with palette quantization. `quality` 1–100 controls min/target quantizer quality.
-pub fn encode_png_quantized(img: &DynamicImage, quality: u8, dpi: Option<u32>) -> Result<Vec<u8>, PicooError> {
+pub fn encode_png_quantized(
+    img: &DynamicImage,
+    quality: u8,
+    dpi: Option<u32>,
+) -> Result<Vec<u8>, PicooError> {
     let rgba = img.to_rgba8();
     let width = rgba.width() as usize;
     let height = rgba.height() as usize;

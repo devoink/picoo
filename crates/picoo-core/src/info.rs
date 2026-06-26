@@ -36,7 +36,10 @@ pub fn get_info(input: &[u8]) -> Result<ImageInfo, PicooError> {
     })
 }
 
-fn read_dimensions(input: &[u8], fmt: ImageFormat) -> Result<(u32, u32, bool, Option<u8>), PicooError> {
+fn read_dimensions(
+    input: &[u8],
+    fmt: ImageFormat,
+) -> Result<(u32, u32, bool, Option<u8>), PicooError> {
     match fmt {
         ImageFormat::Png => read_png_header(input),
         ImageFormat::Jpeg => read_jpeg_sof(input),
