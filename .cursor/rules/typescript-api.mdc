@@ -1,0 +1,12 @@
+---
+description: TypeScript API and Worker conventions
+globs: packages/**/*.ts
+---
+
+# TypeScript API rules
+
+- `process` / `processBatch` → single Worker, serial queue
+- `info` / `infoBatch` → main thread (WASM header read)
+- Batch merge: `{ ...defaults, ...item.options }`; `crop` whole-object override
+- Runtime adapter: `web` default, `mp-weixin` + required `wasmPath`
+- Do not expose Worker internals or raw wasm init to users

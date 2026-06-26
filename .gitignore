@@ -1,0 +1,13 @@
+node_modules/
+dist/
+packages/core/pkg-web/
+packages/core/pkg-mp/
+target/
+*.wasm.bak
+.DS_Store
+coverage/
+.env
+test-results/
+playwright-report/
+playwright/.cache/
+.playwright-mcp/

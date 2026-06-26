@@ -1,0 +1,17 @@
+---
+description: Rust and WASM constraints for picoo-core
+globs: crates/**/*.rs
+---
+
+# Rust / WASM rules
+
+- Keep wasm-bindgen exports minimal: `get_image_info`, `process_image`
+- Pass options as JSON string, not per-field bindgen
+- All user errors return `{ code, message }` via JsValue
+- Avoid panics on bad input — return `PicooError`
+- `wasm-pack` profile: `wasm-opt = false` (run wasm-opt in build.sh with SIMD flags)
+- After changes: `cargo test` and `cargo clippy -- -D warnings`
+
+## WebP on WASM
+
+Use `zenwebp`: lossy VP8 by default (`quality` 1–100), `lossless: true` for VP8L. `maxSizeKB` runs quality binary search for lossy WebP; lossless WebP only shrinks dimensions when `autoResize` is enabled.

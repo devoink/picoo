@@ -1,0 +1,10 @@
+{
+  "name": "picoo-monorepo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "test": "cargo test && npm test --prefix packages/core",
+    "test:e2e": "npm run test:e2e --prefix examples/browser"
+  }
+}

@@ -1,0 +1,14 @@
+---
+description: Testing requirements
+globs:
+  - tests/**
+  - "**/*.test.ts"
+  - "**/*_test.rs"
+---
+
+# Testing
+
+- Rust: crop bounds, resize modes, encode round-trip, maxSizeKB
+- TS: batch option merge, error mapping
+- Fixtures in `tests/fixtures/` — keep small (<100KB each)
+- Visual/hash regression optional; do not commit >1MB images

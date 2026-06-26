@@ -1,0 +1,28 @@
+---
+description: picoo project overview and API freeze rules
+globs:
+alwaysApply: true
+---
+
+# picoo — WASM image processing
+
+## Stack
+
+- Rust crate: `picoo-core` (`crates/picoo-core`)
+- npm package: `picoo` (`packages/core`)
+- WASM via wasm-pack, TypeScript Worker wrapper
+
+## Frozen public API
+
+- Single entry: `createImageProcessor()`
+- Methods: `info`, `infoBatch`, `process`, `processBatch`, `dispose`
+- IO helpers: `picoo/io` (`toBytes`, `toBlob`, mp helpers)
+
+Do not add top-level exports like `initWasm`, `compressToSize`, or chain builders.
+
+## AI collaboration
+
+1. Minimal diff — no drive-by refactors
+2. API changes require plan/issue update first
+3. Run `cargo test` and `npm test` before marking done
+4. Check WASM size after dependency changes

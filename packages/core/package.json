@@ -1,0 +1,40 @@
+{
+  "name": "picoo",
+  "version": "0.1.0",
+  "description": "Cross-platform WASM image processing library",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./io": {
+      "import": "./dist/io.js",
+      "types": "./dist/io.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "pkg-web",
+    "pkg-mp",
+    "pkg-mp/picoo_core_bg.wasm.br"
+  ],
+  "sideEffects": [
+    "./pkg-web/picoo_core.js",
+    "./pkg-mp/picoo_core.js"
+  ],
+  "scripts": {
+    "prebuild": "sh -c 'rm -rf pkg-mp && cp -r pkg-web pkg-mp && node ../../scripts/patch-mp-glue.js pkg-mp'",
+    "build": "tsc && tsc -p tsconfig.worker.json",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
