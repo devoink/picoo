@@ -4,9 +4,13 @@
  * 1. WebAssembly → WXWebAssembly
  * 2. Keep string wasmPath for WXWebAssembly.instantiate(path, imports)
  *    (WeChat does not support fetch / ArrayBuffer instantiate)
+ * 3. Inline TextEncoder/TextDecoder polyfill (real devices often lack them)
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const POLYFILL_MARKER = '/* picoo-text-encoding-polyfill */';
 
 const pkgDir = process.argv[2];
 if (!pkgDir) {
@@ -38,6 +42,15 @@ if (fetchRewrite.test(source)) {
   );
 } else {
   console.warn('warning: fetch(module_or_path) pattern not found; glue may need a manual check');
+}
+
+if (!source.includes(POLYFILL_MARKER)) {
+  const polyfillPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    'mp-text-encoding-polyfill.js',
+  );
+  const polyfill = readFileSync(polyfillPath, 'utf8').trim();
+  source = `${POLYFILL_MARKER}\n${polyfill}\n${source}`;
 }
 
 writeFileSync(jsPath, source);

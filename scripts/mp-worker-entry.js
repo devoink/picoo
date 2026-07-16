@@ -5,9 +5,8 @@
  * Constraints:
  * - Can only require() files under workers/
  * - WASM file must live outside workers/ (passed as wasmPath string)
+ * - TextEncoder/TextDecoder polyfill is inlined in picoo_core.js
  */
-require('./text-encoding.js');
-
 const picooCore = require('./picoo_core.js');
 
 function resolveInit(mod) {

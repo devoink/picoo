@@ -89,5 +89,3 @@
       ? self
       : Function('return this')(),
 );
-
-module.exports = {};

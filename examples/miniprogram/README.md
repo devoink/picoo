@@ -32,7 +32,7 @@ npm run dev:mp:watch
 - 将打过补丁的 `pkg-mp` 复制到 `miniprogram/libs/picoo/`（主线程 API + `.wasm.br`）
 - 把 picoo 打成小程序可用的 CommonJS
 - 生成 `miniprogram/workers/picoo/` 供 `wx.createWorker` 使用
-- 注入 `TextDecoder` / `TextEncoder` polyfill（真机常缺失）
+- 将 `TextDecoder` / `TextEncoder` polyfill 内联进 `picoo_core.js`（真机常缺失）
 
 ## 用开发者工具打开
 

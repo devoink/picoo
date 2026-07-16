@@ -5,14 +5,13 @@ let defaultWasmPath;
 let loadError = '';
 
 try {
-  require('../../libs/picoo/text-encoding.js');
   ({ createImageProcessor } = require('../../libs/picoo/index.js'));
   ({ toBytesFromPath, toTempPath } = require('../../libs/picoo/io.js'));
   defaultWasmPath = require('../../libs/picoo/wasm-path.js');
 } catch (err) {
   const detail = err instanceof Error ? err.message : String(err);
   loadError =
-    detail.includes('text-encoding') || detail.includes('picoo') || detail.includes('module')
+    detail.includes('picoo') || detail.includes('module')
       ? `加载 picoo 失败：${detail}\n\n若缺少 libs/picoo，请在仓库根目录执行：\n./scripts/build.sh\nnpm run sync:mp`
       : detail;
 }

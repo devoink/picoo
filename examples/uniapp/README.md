@@ -37,4 +37,4 @@ const outPath = await toTempPath(result);
 - 微信基础库 ≥ 2.13（`WXWebAssembly`）
 - ≥ 2.15 支持 Worker（`process` 默认走 `wx.createWorker`）
 - SIMD：微信 ≥ 8.0.25
-- 真机可能缺少 `TextDecoder`（原生示例通过 `sync:mp` 注入 polyfill）
+- 真机可能缺少 `TextDecoder`（使用 `pkg-mp` 的 `picoo_core.js`，已内联 polyfill）

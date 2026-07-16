@@ -134,16 +134,18 @@ if (glueEsbuild.errors?.length) {
 writeFileSync(gluePath, readFileSync(join(outDir, "picoo_core.cjs.js")));
 rmSync(join(outDir, "picoo_core.cjs.js"), { force: true });
 
-// Real-device WeChat JS often lacks TextDecoder; wasm-bindgen needs it at load time.
-copyFileSync(
-  join(root, "scripts/mp-text-encoding-polyfill.js"),
-  join(outDir, "text-encoding.js"),
-);
-const polyfillRequire = "require('./text-encoding.js');\n";
-for (const name of ["picoo_core.js", "index.js"]) {
-  const filePath = join(outDir, name);
-  writeFileSync(filePath, polyfillRequire + readFileSync(filePath, "utf8"));
+// Real-device WeChat JS often lacks TextDecoder; inline into glue (not a separate file).
+const POLYFILL_MARKER = "/* picoo-text-encoding-polyfill */";
+let glueCjs = readFileSync(gluePath, "utf8");
+if (!glueCjs.includes(POLYFILL_MARKER)) {
+  const polyfill = readFileSync(
+    join(root, "scripts/mp-text-encoding-polyfill.js"),
+    "utf8",
+  ).trim();
+  glueCjs = `${POLYFILL_MARKER}\n${polyfill}\n${glueCjs}`;
+  writeFileSync(gluePath, glueCjs);
 }
+rmSync(join(outDir, "text-encoding.js"), { force: true });
 
 writeFileSync(join(outDir, "wasm-path.js"), `module.exports = ${JSON.stringify(preferredWasm)};\n`);
 
@@ -152,7 +154,6 @@ const workerDir = join(root, "examples/miniprogram/miniprogram/workers/picoo");
 rmSync(workerDir, { recursive: true, force: true });
 mkdirSync(workerDir, { recursive: true });
 copyFileSync(join(outDir, "picoo_core.js"), join(workerDir, "picoo_core.js"));
-copyFileSync(join(outDir, "text-encoding.js"), join(workerDir, "text-encoding.js"));
 copyFileSync(join(root, "scripts/mp-worker-entry.js"), join(workerDir, "index.js"));
 writeFileSync(
   join(workerDir, "README.md"),
