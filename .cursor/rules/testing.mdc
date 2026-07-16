@@ -1,14 +1,14 @@
 ---
-description: Testing requirements
+description: 测试要求
 globs:
   - tests/**
   - "**/*.test.ts"
   - "**/*_test.rs"
 ---
 
-# Testing
+# 测试
 
-- Rust: crop bounds, resize modes, encode round-trip, maxSizeKB
-- TS: batch option merge, error mapping
-- Fixtures in `tests/fixtures/` — keep small (<100KB each)
-- Visual/hash regression optional; do not commit >1MB images
+- Rust：裁剪边界、缩放模式、编码往返、`maxSizeKB`
+- TS：批量选项合并、错误映射
+- Fixtures 放在 `tests/fixtures/` — 保持小体积（每个 <100KB）
+- 视觉 / hash 回归可选；勿提交 >1MB 的图片

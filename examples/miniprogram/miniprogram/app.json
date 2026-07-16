@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "picoo",
+    "navigationBarBackgroundColor": "#141414",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f3f1ec",
+    "backgroundTextStyle": "dark"
+  },
+  "workers": "workers",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

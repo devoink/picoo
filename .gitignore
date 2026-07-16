@@ -11,3 +11,7 @@ test-results/
 playwright-report/
 playwright/.cache/
 .playwright-mcp/
+examples/miniprogram/miniprogram/libs/picoo/*
+!examples/miniprogram/miniprogram/libs/picoo/README.md
+examples/miniprogram/miniprogram/workers/picoo/*
+!examples/miniprogram/miniprogram/workers/picoo/README.md

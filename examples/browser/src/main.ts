@@ -59,11 +59,14 @@ function appendLog(line: string) {
   logEl.textContent += `${line}\n`;
 }
 
-function renderMeta(container: HTMLElement, info: ImageInfo, saved?: number) {
-  const ratio =
-    saved !== undefined && info.size > 0
-      ? `<span class="highlight">-${((saved / info.size) * 100).toFixed(0)}%</span>`
-      : '';
+function renderMeta(container: HTMLElement, info: ImageInfo, originalSize?: number) {
+  let ratio = '';
+  if (originalSize !== undefined && originalSize > 0) {
+    const deltaPct = ((info.size - originalSize) / originalSize) * 100;
+    const sign = deltaPct > 0 ? '+' : '';
+    const kind = deltaPct > 0 ? 'up' : deltaPct < 0 ? 'down' : 'same';
+    ratio = `<span class="highlight highlight--${kind}">${sign}${deltaPct.toFixed(1)}%</span>`;
+  }
   container.innerHTML = `
     <dt>尺寸</dt><dd>${info.width} × ${info.height}</dd>
     <dt>格式</dt><dd>${info.format.toUpperCase()}</dd>
@@ -109,7 +112,6 @@ function showResult(result: ProcessResult, originalSize: number) {
   placeholderResult.hidden = true;
   downloadBtn.hidden = false;
 
-  const saved = Math.max(0, originalSize - result.size);
   renderMeta(
     metaResult,
     {
@@ -120,7 +122,7 @@ function showResult(result: ProcessResult, originalSize: number) {
       size: result.size,
       hasAlpha: result.format === 'png' || result.format === 'webp',
     },
-    saved,
+    originalSize,
   );
 }
 
@@ -158,6 +160,9 @@ function syncFormatControls() {
   const isPng = format === 'png';
   const maxSizeKB = Number(($('maxSizeKB') as HTMLInputElement).value);
   losslessField.hidden = !isWebp;
+  if (!isWebp) {
+    losslessCheckbox.checked = false;
+  }
   qualityLabel.textContent = isPng ? 'PNG 量化强度' : isWebp ? 'WebP 有损质量' : 'JPEG 质量';
   const losslessOn = isWebp && losslessCheckbox.checked;
   qualityRange.disabled = maxSizeKB > 0 || losslessOn;

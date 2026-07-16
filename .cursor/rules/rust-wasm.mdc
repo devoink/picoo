@@ -1,17 +1,17 @@
 ---
-description: Rust and WASM constraints for picoo-core
+description: picoo-core 的 Rust / WASM 约束
 globs: crates/**/*.rs
 ---
 
-# Rust / WASM rules
+# Rust / WASM 规则
 
-- Keep wasm-bindgen exports minimal: `get_image_info`, `process_image`
-- Pass options as JSON string, not per-field bindgen
-- All user errors return `{ code, message }` via JsValue
-- Avoid panics on bad input — return `PicooError`
-- `wasm-pack` profile: `wasm-opt = false` (run wasm-opt in build.sh with SIMD flags)
-- After changes: `cargo test` and `cargo clippy -- -D warnings`
+- wasm-bindgen 导出保持精简：`get_image_info`、`process_image`
+- 选项以 JSON 字符串传入，不要逐字段 bindgen
+- 用户错误一律通过 JsValue 返回 `{ code, message }`
+- 避免坏输入导致 panic — 返回 `PicooError`
+- `wasm-pack` profile：`wasm-opt = false`（在 `build.sh` 中带 SIMD 标志跑 wasm-opt）
+- 改完后：`cargo test` 与 `cargo clippy -- -D warnings`
 
-## WebP on WASM
+## WASM 上的 WebP
 
-Use `zenwebp`: lossy VP8 by default (`quality` 1–100), `lossless: true` for VP8L. `maxSizeKB` runs quality binary search for lossy WebP; lossless WebP only shrinks dimensions when `autoResize` is enabled.
+使用 `zenwebp`：默认有损 VP8（`quality` 1–100），`lossless: true` 为 VP8L。`maxSizeKB` 对有损 WebP 做质量二分；无损 WebP 仅在开启 `autoResize` 时通过缩小尺寸逼近体积。

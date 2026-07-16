@@ -18,19 +18,27 @@
   },
   "files": [
     "dist",
-    "pkg-web",
-    "pkg-mp",
-    "pkg-mp/picoo_core_bg.wasm.br"
+    "pkg-web/picoo_core.js",
+    "pkg-web/picoo_core.d.ts",
+    "pkg-web/picoo_core_bg.wasm",
+    "pkg-web/picoo_core_bg.wasm.d.ts",
+    "pkg-web/package.json",
+    "pkg-mp/picoo_core.js",
+    "pkg-mp/picoo_core.d.ts",
+    "pkg-mp/picoo_core_bg.wasm",
+    "pkg-mp/picoo_core_bg.wasm.d.ts",
+    "pkg-mp/picoo_core_bg.wasm.br",
+    "pkg-mp/package.json"
   ],
   "sideEffects": [
     "./pkg-web/picoo_core.js",
     "./pkg-mp/picoo_core.js"
   ],
   "scripts": {
-    "prebuild": "sh -c 'rm -rf pkg-mp && cp -r pkg-web pkg-mp && node ../../scripts/patch-mp-glue.js pkg-mp'",
+    "prebuild": "node ../../scripts/prepare-pkg-mp.mjs",
     "build": "tsc && tsc -p tsconfig.worker.json",
     "test": "vitest run",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && npm test"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

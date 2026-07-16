@@ -198,6 +198,10 @@ body {
   gap: 0.25rem;
 }
 
+.field[hidden] {
+  display: none !important;
+}
+
 .field span {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -417,6 +421,17 @@ body {
 }
 
 .meta .highlight {
-  color: var(--success);
   font-weight: 600;
+}
+
+.meta .highlight--down {
+  color: var(--success);
+}
+
+.meta .highlight--up {
+  color: var(--danger, #c44);
+}
+
+.meta .highlight--same {
+  color: var(--muted);
 }

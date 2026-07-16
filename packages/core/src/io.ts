@@ -10,6 +10,24 @@ export function toBlob(result: ProcessResult): Blob {
   return new Blob([copy], { type: result.mimeType });
 }
 
+function isArrayBufferLike(value: unknown): value is ArrayBuffer {
+  if (value instanceof ArrayBuffer) return true;
+  // WeChat may return ArrayBuffer from another JS realm; instanceof fails there.
+  return Object.prototype.toString.call(value) === '[object ArrayBuffer]';
+}
+
+function toUint8ArrayFromWxRead(data: unknown): Uint8Array {
+  if (isArrayBufferLike(data)) {
+    return new Uint8Array(data);
+  }
+  if (ArrayBuffer.isView(data)) {
+    return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  }
+  throw new Error(
+    `Expected ArrayBuffer from readFile (got ${data === null ? 'null' : typeof data})`,
+  );
+}
+
 /** WeChat mini program: read file from local path via wx.getFileSystemManager */
 export function toBytesFromPath(path: string): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
@@ -20,12 +38,12 @@ export function toBytesFromPath(path: string): Promise<Uint8Array> {
     }
     wxGlobal.getFileSystemManager().readFile({
       filePath: path,
+      // omit encoding → binary ArrayBuffer (WeChat default)
       success: (res) => {
-        const data = res.data;
-        if (data instanceof ArrayBuffer) {
-          resolve(new Uint8Array(data));
-        } else {
-          reject(new Error('Expected ArrayBuffer from readFile'));
+        try {
+          resolve(toUint8ArrayFromWxRead(res.data));
+        } catch (err) {
+          reject(err instanceof Error ? err : new Error(String(err)));
         }
       },
       fail: (err) => reject(new Error(err.errMsg ?? 'readFile failed')),
@@ -49,7 +67,6 @@ export function toTempPath(result: ProcessResult): Promise<string> {
     wxGlobal.getFileSystemManager().writeFile({
       filePath,
       data: buffer,
-      encoding: 'binary',
       success: () => resolve(filePath),
       fail: (err) => reject(new Error(err.errMsg ?? 'writeFile failed')),
     });
@@ -67,8 +84,8 @@ declare namespace WechatMiniprogram {
       }): void;
       writeFile(opts: {
         filePath: string;
-        data: ArrayBuffer;
-        encoding: string;
+        data: ArrayBuffer | string;
+        encoding?: string;
         success: () => void;
         fail: (err: { errMsg?: string }) => void;
       }): void;

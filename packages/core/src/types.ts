@@ -62,6 +62,11 @@ export type Runtime = 'web' | 'mp-weixin';
 export interface ProcessorOptions {
   runtime?: Runtime;
   wasmPath?: string;
+  /**
+   * mp-weixin only: script path for `wx.createWorker` (no leading slash).
+   * Default: `workers/picoo/index.js`
+   */
+  workerScript?: string;
 }
 
 export interface ImageProcessor {

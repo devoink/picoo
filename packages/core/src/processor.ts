@@ -1,5 +1,5 @@
 import { webAdapter } from './adapters/web.js';
-import { mpWeixinAdapter } from './adapters/mp-weixin.js';
+import { createMpWeixinAdapter } from './adapters/mp-weixin.js';
 import type { RuntimeAdapter } from './adapters/types.js';
 import { resolveBatchOptions } from './batch.js';
 import { toPicooError } from './errors.js';
@@ -20,7 +20,9 @@ type WorkerResponse =
 
 function getAdapter(options?: ProcessorOptions): RuntimeAdapter {
   const runtime = options?.runtime ?? 'web';
-  if (runtime === 'mp-weixin') return mpWeixinAdapter;
+  if (runtime === 'mp-weixin') {
+    return createMpWeixinAdapter({ workerScript: options?.workerScript });
+  }
   return webAdapter;
 }
 

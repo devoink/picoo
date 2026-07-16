@@ -1,0 +1,9 @@
+{
+  "desc": "picoo demo",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

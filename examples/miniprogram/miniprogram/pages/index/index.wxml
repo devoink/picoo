@@ -1,0 +1,171 @@
+<view class="page">
+  <view class="hero">
+    <text class="brand">picoo</text>
+    <text class="tagline">WASM 图片处理 · 原生小程序</text>
+  </view>
+
+  <view class="status status--{{ statusKind }}">{{ statusText }}</view>
+
+  <view class="card">
+    <view class="card-head">
+      <text class="card-title">图片 {{ selectedCount ? '(' + selectedCount + ')' : '' }}</text>
+      <view class="card-actions">
+        <text class="card-action" wx:if="{{ selectedCount }}" bindtap="onClear">清空</text>
+        <text class="card-action" bindtap="onChoose">{{ selectedCount ? '重选' : '选择' }}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{ !selectedCount }}" class="preview" bindtap="onChoose">
+      <view class="preview-placeholder">
+        <text class="placeholder-title">点击选择图片</text>
+        <text class="hint">支持批量，最多 {{ maxCount }} 张</text>
+      </view>
+    </view>
+
+    <scroll-view wx:else class="thumb-scroll" scroll-x enable-flex>
+      <view
+        class="thumb {{ index === activeIndex ? 'is-active' : '' }}"
+        wx:for="{{ items }}"
+        wx:key="path"
+        data-index="{{ index }}"
+        bindtap="onSelectItem"
+      >
+        <image class="thumb-image" src="{{ item.path }}" mode="aspectFill" />
+        <text class="thumb-badge">{{ index + 1 }}</text>
+      </view>
+    </scroll-view>
+
+    <view wx:if="{{ activeMeta }}" class="meta">{{ activeMeta }}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">参数</view>
+
+    <view class="field">
+      <text class="label">宽度</text>
+      <input
+        class="input"
+        type="number"
+        value="{{ width }}"
+        data-key="width"
+        bindinput="onFieldInput"
+        placeholder="0 = 不限制"
+      />
+    </view>
+
+    <view class="field">
+      <text class="label">高度</text>
+      <input
+        class="input"
+        type="number"
+        value="{{ height }}"
+        data-key="height"
+        bindinput="onFieldInput"
+        placeholder="0 = 不限制"
+      />
+    </view>
+
+    <view class="field">
+      <text class="label">格式</text>
+      <picker mode="selector" range="{{ formatLabels }}" value="{{ formatIndex }}" bindchange="onFormatChange">
+        <view class="picker">
+          <text>{{ formatLabels[formatIndex] }}</text>
+          <text class="picker-chevron">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="field" wx:if="{{ formats[formatIndex] === 'webp' }}">
+      <text class="label">无损 WebP</text>
+      <switch checked="{{ lossless }}" bindchange="onLosslessChange" color="#1a1a1a" />
+    </view>
+
+    <view class="field field--stack {{ qualityDisabled ? 'is-disabled' : '' }}">
+      <view class="field-row">
+        <text class="label">{{ qualityLabel }}</text>
+        <text class="value-pill">{{ quality }}</text>
+      </view>
+      <slider
+        class="quality-slider"
+        min="1"
+        max="100"
+        step="1"
+        value="{{ quality }}"
+        disabled="{{ qualityDisabled }}"
+        show-value="{{ false }}"
+        block-size="{{ 22 }}"
+        activeColor="#1a1a1a"
+        backgroundColor="#ddd8ce"
+        block-color="#1a1a1a"
+        bindchanging="onQualityChanging"
+        bindchange="onQualityChange"
+      />
+      <text wx:if="{{ qualityDisabled }}" class="field-hint">
+        {{ maxSizeKB ? '已启用目标体积，质量由二分搜索决定' : '无损 WebP 忽略质量' }}
+      </text>
+    </view>
+
+    <view class="field">
+      <text class="label">目标体积</text>
+      <input
+        class="input"
+        type="digit"
+        value="{{ maxSizeKB }}"
+        data-key="maxSizeKB"
+        bindinput="onFieldInput"
+        placeholder="KB，0 = 不启用"
+      />
+    </view>
+  </view>
+
+  <view class="progress" wx:if="{{ busy && progressTotal > 0 }}">
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{ progressPercent }}%;"></view>
+    </view>
+    <text class="progress-text">{{ progressDone }} / {{ progressTotal }}</text>
+  </view>
+
+  <view class="actions">
+    <button
+      class="btn btn-primary"
+      loading="{{ busy }}"
+      disabled="{{ busy || !selectedCount || !ready }}"
+      bindtap="onProcess"
+    >
+      {{ busy ? '处理中…' : (selectedCount > 1 ? '批量处理' : '处理') }}
+    </button>
+    <button
+      class="btn"
+      disabled="{{ busy || !resultCount }}"
+      bindtap="onSave"
+    >
+      {{ resultCount > 1 ? '全部保存' : '保存到相册' }}
+    </button>
+  </view>
+
+  <view class="card" wx:if="{{ resultCount }}">
+    <view class="card-head">
+      <text class="card-title">结果 {{ resultCount > 1 ? '(' + resultCount + ')' : '' }}</text>
+    </view>
+
+    <scroll-view wx:if="{{ resultCount > 1 }}" class="thumb-scroll" scroll-x enable-flex>
+      <view
+        class="thumb {{ index === resultActiveIndex ? 'is-active' : '' }}"
+        wx:for="{{ results }}"
+        wx:key="path"
+        data-index="{{ index }}"
+        bindtap="onSelectResult"
+      >
+        <image class="thumb-image" src="{{ item.path }}" mode="aspectFill" />
+        <text class="thumb-badge">{{ index + 1 }}</text>
+      </view>
+    </scroll-view>
+
+    <view class="preview preview--result">
+      <image wx:if="{{ activeResultPath }}" class="preview-image" src="{{ activeResultPath }}" mode="aspectFit" />
+    </view>
+    <view wx:if="{{ activeResultMeta }}" class="meta">{{ activeResultMeta }}</view>
+  </view>
+
+  <view class="log" wx:if="{{ log }}">{{ log }}</view>
+</view>

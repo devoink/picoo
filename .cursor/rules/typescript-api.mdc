@@ -1,12 +1,13 @@
 ---
-description: TypeScript API and Worker conventions
+description: TypeScript API 与 Worker 约定
 globs: packages/**/*.ts
 ---
 
-# TypeScript API rules
+# TypeScript API 规则
 
-- `process` / `processBatch` → single Worker, serial queue
-- `info` / `infoBatch` → main thread (WASM header read)
-- Batch merge: `{ ...defaults, ...item.options }`; `crop` whole-object override
-- Runtime adapter: `web` default, `mp-weixin` + required `wasmPath`
-- Do not expose Worker internals or raw wasm init to users
+- `process` / `processBatch` → 单个 Worker、串行队列
+- `info` / `infoBatch` → 主线程（WASM 读头）
+- 批量合并：`{ ...defaults, ...item.options }`；`crop` 整对象覆盖
+- 运行时适配：默认 `web`；`mp-weixin` 必须提供 `wasmPath`
+- `mp-weixin` 的 `process` 默认使用 `wx.createWorker`（`workerScript`，默认 `workers/picoo/index.js`）；创建失败则回退主线程 shim
+- 不向用户暴露 Worker 内部实现或原始 wasm init
